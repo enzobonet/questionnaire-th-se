@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digitalisation et organisation des cabinets de conseil à taille humaine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f8f6f0;
+    --accent: #2d6a4f;
+    --accent-light: #40916c;
+    --accent-pale: #d8f3dc;
+    --warm: #e9c46a;
+    --muted: #6b7280;
+    --border: #d1cfc6;
+    --error: #c0392b;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .form-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.15;
+  }
+  .form-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 20%;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: var(--warm);
+    opacity: 0.12;
+  }
+  .header-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm);
+    border: 1px solid var(--warm);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .form-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 4vw, 32px);
+    line-height: 1.25;
+    max-width: 620px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .form-header p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(248,246,240,0.75);
+    max-width: 560px;
+    position: relative;
+  }
+  .form-header .meta {
+    margin-top: 24px;
+    font-size: 13px;
+    color: rgba(248,246,240,0.55);
+    font-style: italic;
+    position: relative;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--border);
+    height: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* CONTAINER */
+  .form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* SECTIONS */
+  .section {
+    display: none;
+    animation: fadeUp 0.35s ease both;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    padding: 36px 0 8px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 32px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .question-card:focus-within {
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 3px var(--accent-pale);
+  }
+  .question-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .question-text {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .question-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+
+  /* RADIO / CHECKBOX */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+  }
+  .option-label:hover {
+    background: var(--accent-pale);
+    border-color: var(--accent-light);
+  }
+  .option-label input[type="radio"],
+  .option-label input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .option-label.selected {
+    background: var(--accent-pale);
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* SCALE */
+  .scale-wrap {
+    margin-top: 8px;
+  }
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .scale-options {
+    display: flex;
+    gap: 10px;
+  }
+  .scale-options label {
+    flex: 1;
+    text-align: center;
+  }
+  .scale-options input[type="radio"] { display: none; }
+  .scale-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+  .scale-options input[type="radio"]:checked + .scale-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .scale-btn:hover { background: var(--accent-pale); border-color: var(--accent-light); color: var(--ink); }
+
+  /* TEXT INPUT */
+  textarea, input[type="text"] {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: white;
+    resize: vertical;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  textarea:focus, input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-pale);
+  }
+
+  /* "Autre" text input inside option */
+  .other-input-wrap {
+    display: none;
+    margin-top: 10px;
+    padding-left: 30px;
+  }
+  .other-input-wrap.visible { display: block; }
+  .other-input-wrap input[type="text"] {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 36px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 13px 28px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,106,79,0.3); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* FIN DU FORMULAIRE */
+  #section-end {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .end-icon {
+    width: 72px; height: 72px;
+    background: var(--error);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 32px;
+  }
+  .end-icon.success { background: var(--accent); }
+  #section-end h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    margin-bottom: 14px;
+  }
+  #section-end p {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ALERT */
+  .alert-error {
+    background: #fdf2f2;
+    border: 1px solid #f5c6cb;
+    color: var(--error);
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  .alert-error.visible { display: block; }
+
+  /* WARNING NOTE */
+  .warning-note {
+    background: #fffbea;
+    border-left: 3px solid var(--warm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #7c6a00;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 480px) {
+    .form-header { padding: 40px 20px 32px; }
+    .question-card { padding: 20px 18px; }
+    .scale-options { gap: 6px; }
+    .scale-btn { height: 40px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="form-header">
+  <div class="header-badge">Enquête quantitative – Thèse professionnelle</div>
+  <h1>Digitalisation et organisation des cabinets de conseil à taille humaine</h1>
+  <p>Dans le cadre de ma thèse professionnelle portant sur la transformation des cabinets de conseil, je mène une enquête auprès de professionnels du conseil en France.</p>
+  <p style="margin-top:12px;">Ce questionnaire est anonyme et prend environ 5 à 7 minutes.</p>
+  <p class="meta">– Enzo BONET, étudiant en Master 2 Stratégie Commerciale (ESMP Mâcon)</p>
+</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="form-container">
+
+  <!-- ===== SECTION 1 : FILTRAGE ===== -->
+  <div class="section active" id="section-1">
+    <div class="section-header">
+      <div class="section-label">Section 1 / 6</div>
+      <div class="section-title">Questions de tri</div>
+      <div class="section-desc">3 questions rapides pour vérifier que ce questionnaire correspond à votre profil</div>
+    </div>
+
+    <div class="warning-note">⚠️ Cette section contient des questions de filtrage. Certaines réponses terminent le questionnaire.</div>
+
+    <!-- Q1 -->
+    <div class="question-card">
+      <div class="question-num">Q1</div>
+      <div class="question-text">Dans quelle région exercez-vous principalement ?</div>
+      <div class="options-list" id="q1-options">
+        <label class="option-label"><input type="radio" name="q1" value="region"> En région (hors Île-de-France)</label>
+        <label class="option-label"><input type="radio" name="q1" value="idf"> Île-de-France</label>
+        <label class="option-label"><input type="radio" name="q1" value="etranger"> À l'étranger</label>
+      </div>
+      <div class="alert-error" id="q1-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card">
+      <div class="question-num">Q2</div>
+      <div class="question-text">Dans quel(s) domaine(s) votre cabinet est-il spécialisé ?</div>
+      <div class="options-list" id="q2-options">
+        <label class="option-label"><input type="radio" name="q2" value="qse"> QSE (Qualité, Sécurité, Environnement)</label>
+        <label class="option-label"><input type="radio" name="q2" value="rse"> RSE / Développement durable</label>
+        <label class="option-label"><input type="radio" name="q2" value="orga"> Organisation / Management</label>
+        <label class="option-label"><input type="radio" name="q2" value="operationnel"> Conseil opérationnel / Performance</label>
+        <label class="option-label"><input type="radio" name="q2" value="rh"> Ressources humaines</label>
+        <label class="option-label"><input type="radio" name="q2" value="autre_domaine"> Autre domaine</label>
+      </div>
+      <div class="alert-error" id="q2-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card">
+      <div class="question-num">Q3</div>
+      <div class="question-text">Quelle est votre situation professionnelle ?</div>
+      <div class="options-list" id="q3-options">
+        <label class="option-label"><input type="radio" name="q3" value="independant"> Consultant indépendant (freelance / micro-entreprise)</label>
+        <label class="option-label"><input type="radio" name="q3" value="cabinet_2_5"> Cabinet de 2 à 5 personnes</label>
+        <label class="option-label"><input type="radio" name="q3" value="cabinet_6_15"> Cabinet de 6 à 15 personnes</label>
+        <label class="option-label"><input type="radio" name="q3" value="cabinet_15plus"> Cabinet de plus de 15 personnes</label>
+        <label class="option-label"><input type="radio" name="q3" value="salarie"> Salarié d'une grande entreprise</label>
+      </div>
+      <div class="alert-error" id="q3-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="validateSection1()">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2 : PROFIL ===== -->
+  <div class="section" id="section-2">
+    <div class="section-header">
+      <div class="section-label">Section 2 / 6</div>
+      <div class="section-title">Profil complémentaire</div>
+      <div class="section-desc">Quelques informations supplémentaires sur votre rôle</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card">
+      <div class="question-num">Q4</div>
+      <div class="question-text">Quel est votre rôle au sein de votre activité ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q4" value="dirigeant"> Dirigeant / Gérant de cabinet</label>
+        <label class="option-label"><input type="radio" name="q4" value="independant"> Consultant indépendant (freelance)</label>
+        <label class="option-label"><input type="radio" name="q4" value="manager"> Manager / Responsable d'activité</label>
+        <label class="option-label"><input type="radio" name="q4" value="senior"> Consultant senior au sein d'un cabinet</label>
+        <label class="option-label"><input type="radio" name="q4" value="autre_role" onclick="toggleOther('q4-other')"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q4-other">
+        <input type="text" name="q4_autre" placeholder="Précisez votre rôle…">
+      </div>
+      <div class="alert-error" id="q4-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card">
+      <div class="question-num">Q5</div>
+      <div class="question-text">Depuis combien d'années votre cabinet existe-t-il ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q5" value="moins3"> Moins de 3 ans</label>
+        <label class="option-label"><input type="radio" name="q5" value="3_7"> 3 à 7 ans</label>
+        <label class="option-label"><input type="radio" name="q5" value="8_15"> 8 à 15 ans</label>
+        <label class="option-label"><input type="radio" name="q5" value="plus15"> Plus de 15 ans</label>
+      </div>
+      <div class="alert-error" id="q5-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToSection('section-1')">← Retour</button>
+      <button class="btn btn-primary" onclick="validateSection('section-2', ['q4','q5'], 'section-3')">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3 : DIGITALISATION ===== -->
+  <div class="section" id="section-3">
+    <div class="section-header">
+      <div class="section-label">Section 3 / 6</div>
+      <div class="section-title">Niveau de digitalisation</div>
+      <div class="section-desc">Vos pratiques actuelles en matière d'outils numériques</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-card">
+      <div class="question-num">Q6</div>
+      <div class="question-text">Comment évaluez-vous globalement le niveau de digitalisation de votre cabinet ?</div>
+      <div class="scale-wrap">
+        <div class="scale-labels">
+          <span>1 – Très faible<br><em style="font-size:11px">(travail quasi 100% manuel/papier)</em></span>
+          <span style="text-align:right">5 – Très avancé<br><em style="font-size:11px">(processus largement automatisés)</em></span>
+        </div>
+        <div class="scale-options">
+          <label><input type="radio" name="q6" value="1"><div class="scale-btn">1</div></label>
+          <label><input type="radio" name="q6" value="2"><div class="scale-btn">2</div></label>
+          <label><input type="radio" name="q6" value="3"><div class="scale-btn">3</div></label>
+          <label><input type="radio" name="q6" value="4"><div class="scale-btn">4</div></label>
+          <label><input type="radio" name="q6" value="5"><div class="scale-btn">5</div></label>
+        </div>
+      </div>
+      <div class="alert-error" id="q6-error">Veuillez sélectionner une valeur.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-card">
+      <div class="question-num">Q7</div>
+      <div class="question-text">Quels outils numériques utilisez-vous au quotidien ?</div>
+      <div class="question-hint">Plusieurs réponses possibles</div>
+      <div class="options-list">
+        <label class="option-label"><input type="checkbox" name="q7" value="bureautique"> Suite bureautique (Word, Excel, PowerPoint)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="gestion_projet"> Outils de gestion de projet (Trello, Notion, Asana…)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="crm"> CRM / gestion commerciale (HubSpot, Pipedrive…)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="facturation"> Outils de facturation / gestion administrative</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="visio"> Outils de visioconférence (Teams, Zoom…)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="collaboratif"> Outils collaboratifs en temps réel (Google Drive, SharePoint…)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="ia"> Intelligence artificielle (ChatGPT, Copilot…)</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="aucun"> Aucun outil numérique particulier</label>
+        <label class="option-label"><input type="checkbox" name="q7" value="autre_outil" onchange="toggleOther('q7-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q7-other">
+        <input type="text" name="q7_autre" placeholder="Précisez…">
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-card">
+      <div class="question-num">Q8</div>
+      <div class="question-text">Avez-vous un site internet professionnel actif ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q8" value="oui_actif"> Oui, régulièrement mis à jour</label>
+        <label class="option-label"><input type="radio" name="q8" value="oui_peu"> Oui, mais peu mis à jour</label>
+        <label class="option-label"><input type="radio" name="q8" value="non_prevu"> Non, mais c'est prévu</label>
+        <label class="option-label"><input type="radio" name="q8" value="non"> Non</label>
+      </div>
+      <div class="alert-error" id="q8-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-card">
+      <div class="question-num">Q9</div>
+      <div class="question-text">Utilisez-vous les réseaux sociaux professionnels pour développer votre activité ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q9" value="oui_strat"> Oui, de manière régulière et stratégique</label>
+        <label class="option-label"><input type="radio" name="q9" value="oui_occ"> Oui, occasionnellement</label>
+        <label class="option-label"><input type="radio" name="q9" value="rarement"> Rarement</label>
+        <label class="option-label"><input type="radio" name="q9" value="non"> Non</label>
+      </div>
+      <div class="alert-error" id="q9-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-card">
+      <div class="question-num">Q10</div>
+      <div class="question-text">Quels sont selon vous les principaux freins à la digitalisation de votre cabinet ?</div>
+      <div class="question-hint">Plusieurs réponses possibles</div>
+      <div class="options-list">
+        <label class="option-label"><input type="checkbox" name="q10" value="temps"> Manque de temps</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="cout"> Coût des outils</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="competences"> Manque de compétences numériques</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="culture"> Résistance culturelle / habitudes de travail</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="proximite"> Crainte de perdre la proximité client</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="offre"> Offre d'outils peu adaptée à mon secteur</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="aucun_frein"> Aucun frein particulier</label>
+        <label class="option-label"><input type="checkbox" name="q10" value="autre_frein" onchange="toggleOther('q10-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q10-other">
+        <input type="text" name="q10_autre" placeholder="Précisez…">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToSection('section-2')">← Retour</button>
+      <button class="btn btn-primary" onclick="validateSection('section-3', ['q6','q8','q9'], 'section-4')">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 : COLLABORATION ===== -->
+  <div class="section" id="section-4">
+    <div class="section-header">
+      <div class="section-label">Section 4 / 6</div>
+      <div class="section-title">Collaboration externe</div>
+      <div class="section-desc">Vos pratiques de travail avec des partenaires extérieurs</div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-card">
+      <div class="question-num">Q11</div>
+      <div class="question-text">Faites-vous appel à des collaborateurs externes pour réaliser vos missions ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q11" value="oui_regulier"> Oui, régulièrement</label>
+        <label class="option-label"><input type="radio" name="q11" value="oui_ponctuel"> Oui, ponctuellement</label>
+        <label class="option-label"><input type="radio" name="q11" value="rarement"> Rarement</label>
+        <label class="option-label"><input type="radio" name="q11" value="non"> Non, jamais</label>
+      </div>
+      <div class="alert-error" id="q11-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-card">
+      <div class="question-num">Q12</div>
+      <div class="question-text">Sous quelle(s) forme(s) travaillez-vous avec des partenaires extérieurs ?</div>
+      <div class="question-hint">Plusieurs réponses possibles</div>
+      <div class="options-list">
+        <label class="option-label"><input type="checkbox" name="q12" value="freelances"> Freelances / consultants indépendants</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="sous_traitance"> Sous-traitance à d'autres cabinets</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="partenariats"> Partenariats formalisés (contrats, accords cadres)</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="co_traitance"> Co-traitance ponctuelle (sans contrat structuré)</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="reseau"> Réseau informel de professionnels</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="non_externes"> Je ne fais pas appel à des externes</label>
+        <label class="option-label"><input type="checkbox" name="q12" value="autre_collab" onchange="toggleOther('q12-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q12-other">
+        <input type="text" name="q12_autre" placeholder="Précisez…">
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-card">
+      <div class="question-num">Q13</div>
+      <div class="question-text">La collaboration externe vous permet-elle de développer votre activité ?</div>
+      <div class="scale-wrap">
+        <div class="scale-labels">
+          <span>1 – Pas du tout</span>
+          <span>5 – Tout à fait</span>
+        </div>
+        <div class="scale-options">
+          <label><input type="radio" name="q13" value="1"><div class="scale-btn">1</div></label>
+          <label><input type="radio" name="q13" value="2"><div class="scale-btn">2</div></label>
+          <label><input type="radio" name="q13" value="3"><div class="scale-btn">3</div></label>
+          <label><input type="radio" name="q13" value="4"><div class="scale-btn">4</div></label>
+          <label><input type="radio" name="q13" value="5"><div class="scale-btn">5</div></label>
+        </div>
+      </div>
+      <div class="alert-error" id="q13-error">Veuillez sélectionner une valeur.</div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-card">
+      <div class="question-num">Q14</div>
+      <div class="question-text">Quelles difficultés rencontrez-vous dans la gestion de ces collaborations ?</div>
+      <div class="question-hint">Plusieurs réponses possibles</div>
+      <div class="options-list">
+        <label class="option-label"><input type="checkbox" name="q14" value="profils"> Trouver des profils fiables et disponibles</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="contractuel"> Formaliser et sécuriser les relations contractuelles</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="qualite"> Maintenir la qualité et la cohérence des livrables</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="distance"> Coordonner à distance</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="info"> Partager les informations et documents efficacement</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="aucune_diff"> Aucune difficulté particulière</label>
+        <label class="option-label"><input type="checkbox" name="q14" value="autre_diff" onchange="toggleOther('q14-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q14-other">
+        <input type="text" name="q14_autre" placeholder="Précisez…">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToSection('section-3')">← Retour</button>
+      <button class="btn btn-primary" onclick="validateSection('section-4', ['q11','q13'], 'section-5')">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 5 : VALEUR HUMAINE ===== -->
+  <div class="section" id="section-5">
+    <div class="section-header">
+      <div class="section-label">Section 5 / 6</div>
+      <div class="section-title">Valeur humaine et relation client</div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-card">
+      <div class="question-num">Q15</div>
+      <div class="question-text">Comment décririez-vous la relation que vous entretenez avec vos clients ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q15" value="proche"> Très proche et sur-mesure</label>
+        <label class="option-label"><input type="radio" name="q15" value="pro"> Professionnelle et régulière</label>
+        <label class="option-label"><input type="radio" name="q15" value="transac"> Principalement transactionnelle</label>
+        <label class="option-label"><input type="radio" name="q15" value="variable"> Variable selon les clients</label>
+      </div>
+      <div class="alert-error" id="q15-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-card">
+      <div class="question-num">Q16</div>
+      <div class="question-text">Selon vous, qu'est-ce qui différencie votre cabinet de la concurrence ?</div>
+      <div class="question-hint">Plusieurs réponses possibles</div>
+      <div class="options-list">
+        <label class="option-label"><input type="checkbox" name="q16" value="expertise"> Expertise métier pointue</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="proximite"> Proximité et disponibilité</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="prix"> Prix compétitifs</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="confiance"> Relation de confiance durable</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="agilite"> Agilité et réactivité</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="personnalise"> Approche personnalisée</label>
+        <label class="option-label"><input type="checkbox" name="q16" value="autre_diff2" onchange="toggleOther('q16-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q16-other">
+        <input type="text" name="q16_autre" placeholder="Précisez…">
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-card">
+      <div class="question-num">Q17</div>
+      <div class="question-text">Dans quelle mesure la digitalisation vous semble-t-elle compatible avec le maintien d'une relation client humaine et de qualité ?</div>
+      <div class="scale-wrap">
+        <div class="scale-labels">
+          <span>1 – Totalement incompatible</span>
+          <span>5 – Totalement compatible</span>
+        </div>
+        <div class="scale-options">
+          <label><input type="radio" name="q17" value="1"><div class="scale-btn">1</div></label>
+          <label><input type="radio" name="q17" value="2"><div class="scale-btn">2</div></label>
+          <label><input type="radio" name="q17" value="3"><div class="scale-btn">3</div></label>
+          <label><input type="radio" name="q17" value="4"><div class="scale-btn">4</div></label>
+          <label><input type="radio" name="q17" value="5"><div class="scale-btn">5</div></label>
+        </div>
+      </div>
+      <div class="alert-error" id="q17-error">Veuillez sélectionner une valeur.</div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-card">
+      <div class="question-num">Q18</div>
+      <div class="question-text">Avez-vous le sentiment que la digitalisation modifie la relation de confiance avec vos clients ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q18" value="renforce"> Oui, elle la renforce</label>
+        <label class="option-label"><input type="radio" name="q18" value="fragilise"> Oui, elle la fragilise</label>
+        <label class="option-label"><input type="radio" name="q18" value="rien"> Non, elle ne change rien</label>
+        <label class="option-label"><input type="radio" name="q18" value="sais_pas"> Je ne sais pas</label>
+      </div>
+      <div class="alert-error" id="q18-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToSection('section-4')">← Retour</button>
+      <button class="btn btn-primary" onclick="validateSection('section-5', ['q15','q17','q18'], 'section-6')">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 : PRIORITÉS ===== -->
+  <div class="section" id="section-6">
+    <div class="section-header">
+      <div class="section-label">Section 6 / 6</div>
+      <div class="section-title">Priorités stratégiques</div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-card">
+      <div class="question-num">Q19</div>
+      <div class="question-text">Quelles sont vos priorités stratégiques pour les 2 à 3 prochaines années ?</div>
+      <div class="question-hint">3 priorités maximum</div>
+      <div class="options-list" id="q19-options">
+        <label class="option-label"><input type="checkbox" name="q19" value="presence" onchange="limitCheckbox('q19-options',3)"> Développer ma présence digitale</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="reseau" onchange="limitCheckbox('q19-options',3)"> Structurer mon réseau de collaborateurs externes</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="fideliser" onchange="limitCheckbox('q19-options',3)"> Fidéliser et développer mon portefeuille clients</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="specialiser" onchange="limitCheckbox('q19-options',3)"> Me spécialiser davantage</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="recruter" onchange="limitCheckbox('q19-options',3)"> Recruter et agrandir l'équipe</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="rentabilite" onchange="limitCheckbox('q19-options',3)"> Améliorer ma rentabilité et mes processus internes</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="nouvelles_offres" onchange="limitCheckbox('q19-options',3)"> Développer de nouvelles offres de services</label>
+        <label class="option-label"><input type="checkbox" name="q19" value="autre_prio" onchange="limitCheckbox('q19-options',3); toggleOther('q19-other', this)"> Autre</label>
+      </div>
+      <div class="other-input-wrap" id="q19-other">
+        <input type="text" name="q19_autre" placeholder="Précisez…">
+      </div>
+      <div class="alert-error" id="q19-error">Veuillez sélectionner au moins une priorité (3 maximum).</div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-card">
+      <div class="question-num">Q20</div>
+      <div class="question-text">Pensez-vous que les cabinets de conseil à taille humaine ont un avenir face aux grands groupes et plateformes numériques ?</div>
+      <div class="options-list">
+        <label class="option-label"><input type="radio" name="q20" value="oui_clairement"> Oui, clairement – notre valeur ajoutée est irremplaçable</label>
+        <label class="option-label"><input type="radio" name="q20" value="oui_si"> Oui, si on s'adapte et se digitalise</label>
+        <label class="option-label"><input type="radio" name="q20" value="incertain"> Incertain – la concurrence est très forte</label>
+        <label class="option-label"><input type="radio" name="q20" value="non"> Non – le modèle est fragilisé à terme</label>
+      </div>
+      <div class="alert-error" id="q20-error">Veuillez sélectionner une réponse.</div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="question-card">
+      <div class="question-num">Q21</div>
+      <div class="question-text">Avez-vous des remarques ou éléments à ajouter sur votre expérience ?</div>
+      <div class="question-hint">Champ libre – optionnel</div>
+      <textarea name="q21" rows="5" placeholder="Partagez vos observations, expériences ou remarques…"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToSection('section-5')">← Retour</button>
+      <button class="btn btn-primary" onclick="submitForm()">Envoyer le questionnaire ✓</button>
+    </div>
+  </div>
+
+  <!-- ===== FIN : HORS CIBLE ===== -->
+  <div class="section" id="section-end-excluded">
+    <div id="section-end">
+      <div class="end-icon">✕</div>
+      <h2>Ce questionnaire ne correspond pas à votre profil</h2>
+      <p>Merci pour votre intérêt. Cette étude cible spécifiquement les cabinets de conseil à taille humaine exercant en région (hors Île-de-France), dans des domaines liés au conseil en organisation, QSE, RSE ou performance opérationnelle.</p>
+      <p style="margin-top:16px; font-size:13px; color:#9ca3af;">– Enzo BONET, Thèse professionnelle ESMP Mâcon</p>
+    </div>
+  </div>
+
+  <!-- ===== FIN : MERCI ===== -->
+  <div class="section" id="section-end-success">
+    <div id="section-end">
+      <div class="end-icon success">✓</div>
+      <h2>Merci pour votre participation !</h2>
+      <p>Vos réponses contribuent à une étude sur la transformation des cabinets de conseil à taille humaine.</p>
+      <p style="margin-top:16px; font-size:13px; color:#9ca3af;">– Enzo BONET, étudiant en Master 2 Stratégie Commerciale (ESMP Mâcon) – Entreprise AS2PIQ</p>
+    </div>
+  </div>
+
+</div><!-- /form-container -->
+
+<script>
+  const SECTIONS = ['section-1','section-2','section-3','section-4','section-5','section-6'];
+  const TOTAL_SECTIONS = SECTIONS.length;
+
+  function goToSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateProgress(id);
+  }
+
+  function updateProgress(sectionId) {
+    const idx = SECTIONS.indexOf(sectionId);
+    const pct = idx < 0 ? 100 : Math.round(((idx) / TOTAL_SECTIONS) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  function getRadioValue(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  function showError(id, show) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('visible', show);
+  }
+
+  // Highlight selected radio options
+  document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio') {
+      const name = e.target.name;
+      document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+        r.closest('.option-label') && r.closest('.option-label').classList.remove('selected');
+      });
+      if (e.target.closest('.option-label')) {
+        e.target.closest('.option-label').classList.add('selected');
+      }
+    }
+    if (e.target.type === 'checkbox') {
+      const label = e.target.closest('.option-label');
+      if (label) label.classList.toggle('selected', e.target.checked);
+    }
+  });
+
+  function toggleOther(id, checkbox) {
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    if (checkbox) {
+      wrap.classList.toggle('visible', checkbox.checked);
+    } else {
+      // called from onclick on radio
+      wrap.classList.toggle('visible', true);
+    }
+  }
+
+  function limitCheckbox(groupId, max) {
+    const boxes = document.querySelectorAll(`#${groupId} input[type="checkbox"]`);
+    const checked = Array.from(boxes).filter(b => b.checked);
+    if (checked.length > max) {
+      // uncheck the last one attempted (the one that triggered this)
+      boxes.forEach(b => {
+        if (b.checked && !b._wasChecked) b.checked = false;
+      });
+    }
+    boxes.forEach(b => b._wasChecked = b.checked);
+  }
+
+  // Section 1 validation with branching logic
+  function validateSection1() {
+    const q1 = getRadioValue('q1');
+    const q2 = getRadioValue('q2');
+    const q3 = getRadioValue('q3');
+    let hasError = false;
+
+    if (!q1) { showError('q1-error', true); hasError = true; } else showError('q1-error', false);
+    if (!q2) { showError('q2-error', true); hasError = true; } else showError('q2-error', false);
+    if (!q3) { showError('q3-error', true); hasError = true; } else showError('q3-error', false);
+
+    if (hasError) return;
+
+    // Q1 branching
+    if (q1 === 'idf' || q1 === 'etranger') {
+      goToSection('section-end-excluded'); return;
+    }
+
+    // Q2 branching
+    const q2Valid = ['qse','rse','orga','operationnel'];
+    if (!q2Valid.includes(q2)) {
+      goToSection('section-end-excluded'); return;
+    }
+
+    // Q3 branching
+    if (q3 === 'cabinet_15plus' || q3 === 'salarie') {
+      goToSection('section-end-excluded'); return;
+    }
+
+    // All good → Section 2
+    goToSection('section-2');
+  }
+
+  // Generic section validator for sections 2-5
+  function validateSection(currentId, requiredRadios, nextId) {
+    let hasError = false;
+    requiredRadios.forEach(name => {
+      const val = getRadioValue(name);
+      if (!val) { showError(name + '-error', true); hasError = true; }
+      else showError(name + '-error', false);
+    });
+    if (hasError) {
+      // scroll to first error
+      const firstErr = document.querySelector('.alert-error.visible');
+      if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    goToSection(nextId);
+  }
+
+  function submitForm() {
+    // Validate section 6 required fields
+    const q20 = getRadioValue('q20');
+    const q19boxes = document.querySelectorAll('input[name="q19"]:checked');
+    let hasError = false;
+
+    if (q19boxes.length === 0) { showError('q19-error', true); hasError = true; } else showError('q19-error', false);
+    if (!q20) { showError('q20-error', true); hasError = true; } else showError('q20-error', false);
+
+    if (hasError) {
+      const firstErr = document.querySelector('.alert-error.visible');
+      if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Collect all answers
+    const data = {};
+
+    // Radios
+    ['q1','q2','q3','q4','q5','q6','q8','q9','q11','q13','q15','q17','q18','q20'].forEach(name => {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      data[name] = el ? el.value : '';
+    });
+
+    // Checkboxes (multiple values)
+    ['q7','q10','q12','q14','q16','q19'].forEach(name => {
+      const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(e => e.value);
+      data[name] = checked.join(', ');
+    });
+
+    // Text fields (Autre + Q21)
+    ['q4_autre','q7_autre','q10_autre','q12_autre','q14_autre','q16_autre','q19_autre','q21'].forEach(name => {
+      const el = document.querySelector(`[name="${name}"]`);
+      data[name] = el ? el.value : '';
+    });
+
+    // Send to Formspree
+    fetch('https://formspree.io/f/mreyrqee', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (res.ok) {
+        goToSection('section-end-success');
+      } else {
+        alert("Une erreur s'est produite lors de l'envoi. Veuillez réessayer.");
+      }
+    })
+    .catch(() => {
+      alert("Impossible d'envoyer le formulaire. Vérifiez votre connexion internet.");
+    });
+  }
+</script>
+</body>
+</html>
